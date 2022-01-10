@@ -1,0 +1,477 @@
+<?php
+session_start();
+// echo $_SESSION["user"];
+if(!isset($_SESSION["pm_user"]))
+{
+ header('location:../webapp/login/login.php');
+}
+// date_default_timezone_set('Asia/Bangkok');
+
+$page = $_SESSION['pm_ses_page'];
+$u_level = $_SESSION["pm_level"];
+
+date_default_timezone_set('Asia/Bangkok');
+
+ ?>
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>PDS PM Systems :: ระบบซ่อมบำรุง บริษัท ปาล์มดีศรีนคร จำกัด</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/font-awesome.css">
+    <link rel="stylesheet" href="../css/style.css">
+
+    <script src="dist/jquery2.2.0/jquery.min.js"></script>
+    <script src="dist/bootstrap.min.js"></script>
+
+    <script src="dist/for_report/js/jquery.dataTables.js"></script>
+    <script src="dist/for_report/js/dataTables.bootstrap.js"></script>
+
+
+    <style type="text/css" media="all">
+
+/* For Print */
+      @media print {
+
+        body{ background: #ffffff!important;}
+        .print_panel { margin:0px; }
+
+        #control_event, #p_data_length, #p_data_filter, #p_data_paginate, #p_data_info { display: none; }
+        #p_iso_start_use { display: block; margin: 5px 0px 0px 0px; }
+        #content { padding:0px!important; }
+        .table-responsive { margin: 0px -10px; padding: 10px!important; }
+        .pagination{ margin-bottom: 0px!important; }
+        .control_nav { display: none!important; }
+
+      }
+
+      @page { size: landscape; }
+
+/* End for Print */
+
+      body{ background: #ffffff!important;}
+      #p_data_length, #p_data_info { float: left; margin: 10px; }
+      #p_data_filter, #p_data_paginate { float: right; margin: 10px; text-align: right!important;}
+      .table-responsive{ overflow-x: hidden; }
+
+
+      @media screen and (max-width: 769px) {
+        .print_panel, .control_box_lr, #p_iso_start_use { display: none!important; }
+      }
+
+      #control_container_nav ,#control_container {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        /* background: #eeeeee; */
+        /* height: 200px; */
+      }
+
+      .control_box_lr, .control_box_lr_nav {
+        width: 250px;
+        /* height: 50px;
+        line-height: 50px; */
+        text-align: center;
+        /* background: #eeeeee; */
+      }
+
+      .control_box_c, .control_box_c_nav {
+        width: 250px;
+        /* height: 50px;
+        line-height: 50px; */
+        text-align: center;
+        margin:auto;
+      }
+
+      .row { margin: -15px!important; }
+
+    </style>
+
+  </head>
+  <body>
+
+   <div class="wrapper" style="display:none;">
+     <?php include('nav.php'); ?>
+
+   	<div id="content" class="">
+
+  <!-- Begin menu_bar -->
+
+      <div id="control_container_nav" class="control_nav" style="padding:10px; margin-bottom:10px;">
+
+        <div class="control_box_lr_nav" style="text-align:left;">
+          <button type="button" id="sidebarCollapse" class="btn btn-light">
+       			<i class="fa fa-align-justify"></i> <span></span>
+       		</button>
+        </div>
+
+          <div class="control_box_c_nav text-center">
+            <span class="badge badge-warning mx-auto"><strong>ระบบซ่อมบำรุง ปาล์มดีศรีนคร</strong></span>
+          </div>
+
+          <div class="control_box_lr_nav" style="text-align:right;">
+            <a href="#" onclick="history.go(-1); return false;" class=""><i class="fa fa-chevron-circle-left text-primary" aria-hidden="true"></i> <span class="text-primary">กลับ</span></a>
+          </div>
+
+      </div>
+
+  <!-- End menu_bar -->
+
+<div id="control_event" class="control_event">
+
+      <div class="clearfix text-center panel panel-info">
+          <div class="panel-heading"><h4><span class="glyphicon glyphicon-file" aria-hidden="true"></span>รายงานรายเดือน (ทุกแผนก)</h4></div>
+      </div>
+
+  <!-- ส่วนข้อมูล set_department -->
+
+
+            <div id="" class="text-center border panel panel-default">
+
+  <!-- Begin panel-body -->
+              <div class="panel-body">
+
+                  <form method="post" id="frm_add" action="p_pm_monthly_report_print.php" class="form-inline">
+
+                    <input type="hidden" name="m_text" id="m_text" value="" />
+                    <input type="hidden" name="y_text" id="y_text" value="" />
+
+                      <div class="form-group" style="padding:15px;">
+                        <label class="">ระบุเดือน และ ปี</label>
+                          <select class="form-control form-control-lg" id="month" name="month" style="margin-bottom:5px;">
+                            <?php
+                            $i = 0;
+                            $month = array("มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม");
+                            foreach($month as $monthname)
+                            {
+                              $i++;
+                            ?>
+                              <option value="<?php if($i < 10){ echo '0'.$i; } else { echo $i; } ?>" <?php if(date("m")==$i){echo "selected=selected";} ?>> <?php echo $monthname ?></option>
+                            <?php } ?>
+                          </select>
+
+                            <select class="form-control form-control-lg"  name="year" id="year" style="margin-bottom:5px;">
+                              <?php for($i=0; $i<=10; $i++) { ?>
+                              <option value="<?php echo date("Y")-$i?>" <?php if(date("Y")==date("Y")+$i){echo "selected=selected";}?> > <?php echo date("Y")-$i+543; ?></option>
+                              <?php } ?>
+                            </select>
+
+                      </div>
+
+                    </form>
+
+                    <div>
+                            <strong>แสดง/ซ่อน column:</strong>
+                            <a href="#" class="toggle-vis" data-column="0"> | ลำดับ</a> |
+                            <a href="#" class="toggle-vis" data-column="1">วันที่/เวลา</a> |
+                            <a href="#"  class="toggle-vis" data-column="2">เลขที่แจ้งซ่อม</a> |
+                            <a href="#"  class="toggle-vis" data-column="3">ประเภทงาน</a> |
+                            <a href="#"  class="toggle-vis" data-column="4">รหัส</a> |
+                            <a href="#"  class="toggle-vis" data-column="5">ชื่อเครื่องจักร</a> |
+                            <a href="#"  class="toggle-vis" data-column="6">แผนก</a> |
+                            <a href="#"  class="toggle-vis" data-column="7">อาการ</a> |
+                            <a href="#"  class="toggle-vis" data-column="8">ผู้แจ้งซ่อม</a> |
+                            <a href="#"  class="toggle-vis" data-column="9">กลุ่มช่าง</a> |
+                            <a href="#"  class="toggle-vis" data-column="10">จัดการ</a>
+                    </div>
+
+              </div>
+  <!-- End panel-body -->
+
+              <div class="panel-footer">
+                <button type="button" id="btn_print" class="btn btn-info" onclick="window.print()">
+                    <span class="glyphicon glyphicon-print"></span> Print or Export PDF
+                </button>
+
+                <!-- <button type="submit" id="btn_gen_pdf" class="btn btn-danger">
+                    <span class="glyphicon glyphicon-file"></span> Export To PDF
+                </button> -->
+              </div>
+
+            </div>
+
+</div>
+<!-- End control_event -->
+
+          <div id="" class="print_panel clearfix" style="clear:both;display:none; margin:0px;">
+
+            <div id="control_container">
+
+              <div class="control_box_lr" style="text-align:left;">
+                <img src="images/PDS-Logo-03.jpg" alt="pds-logo" width="170px;"/>
+              </div>
+
+                <div class="control_box_c text-center">
+                  <h4>ทะเบียนใบแจ้งซ่อม</h4>
+                  <p>(Reaister a Repair Log)</p>
+                  <h5>ประจำเดือน <span id="month_text"></span> <span id="year_text"></span></h5>
+                </div>
+
+                <div class="control_box_lr" style="text-align:right;">
+                  <h5>MT-FR-14</h5>
+                </div>
+
+            </div>
+
+               <div class="table-responsive">
+                <table id="p_data" class="table table-bordered table-striped table-condensed table-hover" cellspacing="0" data-toggle="bootgrid" style="margin-bottom: 0px!important; width:100%!important;">
+                 <thead>
+                  <tr>
+                   <th data-type="numeric" data-sortable="false"></th>
+                   <th>วันที่/เวลา</th>
+                   <th>เลขที่แจ้งซ่อม</th>
+                   <th>ประเภทงาน</th>
+                   <th>รหัส</th>
+                   <th>ชื่อเครื่องจักร</th>
+                   <th>แผนก</th>
+                   <th>อาการ</th>
+                   <th>ผู้แจ้งซ่อม</th>
+                   <th>กลุ่มช่าง</th>
+                   <th data-sortable="false"></th>
+                  </tr>
+                 </thead>
+                </table>
+               </div>
+
+            <div id="p_iso_start_use" class="control_box_lr" style="text-align:left; width:350px!important;">
+                <p>วันที่เริ่มใช้งาน: 1 พ.ย. 2563 แก้ไขครั้งที่: 02</p>
+            </div>
+
+
+		    </div>
+<!-- end ส่วนข้อมูล set_department -->
+
+    </div>
+
+</div>
+
+
+
+</body>
+</html>
+
+
+
+<script type="text/javascript">
+$( document ).ready(function() {
+
+  $('.wrapper').fadeIn('slow');
+
+  getCount('count_my_job');
+  getCount('count_today_job');
+  getCount('count_month_job');
+  getCount('count_no_action_job');
+
+
+$('#sidebarCollapse').on('click',function(){
+  $('#sidebar').toggleClass('active');
+});
+
+$('li').click(function(){
+  $('li').removeClass('active');
+  $(this).addClass('active');
+});
+
+
+//ออกจากระบบ
+
+        $(".logout").click(function(){
+
+                            $.ajax({
+                                type: "POST",
+                                url: "login/logout.php",
+                                success: function(result) {
+                                    if (result == 0) // Success
+                                    {
+                                        //alert("OK");
+                                        $('body').addClass('animated fadeOut');
+                                        window.location.href = '../webapp/login/login.php'; //Will take you to Google.
+                                    }
+                                }
+                            });
+        });
+//ออกจากระบบ
+
+$(document).on('click','a',function(){
+  var strText = $(this).text();
+  var arr = strText.split(' - ');
+
+  $("#i_job_code").val(strText);
+  $("#h_job_code").val(arr[0]);
+  $("#show-list").html('');
+});
+
+
+// $(".dataTables_length").hide();
+
+
+  $('.print_panel').fadeIn('slow');  //แสดงผลแบบ ค่อยๆแสดง ด้วย function fadeIn()
+
+  $("#btn_logout_model").click(function() {
+      $('#logout_model').modal('show');	//แสดงหน้าต่าง modal add_model
+  });
+
+
+           fetch_data('no');
+
+           function fetch_data(is_date_search, month, year)
+           {
+
+            var month = $('#month').val();
+            var year = $('#year').val();
+            var dataTable = $('#p_data').DataTable({
+              "processing" : true,
+              "serverSide" : true,
+              "scrollX": false,
+              "dom": '<lf<t>ip>',
+              "paging":   true,
+              "ordering": true,
+              "stateSave": false, //เวลากด refresh หน้าเว็บจะค้างไว้ที่ page ที่เราเลือก
+              "info":     true,
+              "language": {
+                   search: "ค้นหา:",
+                   info: "แสดงข้อมูล _START_ ถึง _END_ จากข้อมูลที่ค้นพบ  _TOTAL_ รายการ ",
+                   infoFiltered: "(จากข้อมูลทั้งหมด _MAX_ รายการ)",
+                   processing: "กำลังดำเนินการ...",
+                   lengthMenu: "แสดง _MENU_ รายการ/หน้า",
+                   infoEmpty: "กรุณารอสักครู่...",
+                   zeroRecords: "ไม่พบข้อมูล",
+                   paginate: {
+                        "first": "หน้าแรก",
+                       "previous": "ก่อนหน้า", // เปลี่ยน ในส่วนของการ control page
+                       "next": "ถัดไป",
+                        "last": "หน้าสุดท้าย",
+                    },
+               },
+              "pagingType": "full_numbers", //แสดงปุ่ม paginage แบบเต็ม
+               "order" : [],
+               "pageLength": 10, //-1 = All
+               "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "ทั้งหมด"]],
+               "columnDefs": [
+                            { "width": "1%", "targets": 0, "className":"text-center" },
+                            { "width": "8%", "targets": 1, "className":"text-center" },
+                            { "width": "10%", "targets": 2, "className":"text-center" },
+                            { "width": "8%", "targets": 3, "className":"text-center" },
+                            { "width": "6%", "targets": 4, "className":"text-center"},
+                            { "width": "20%", "targets": 5 },
+                            { "width": "10%", "targets": 6 },
+                            { "width": "21%", "targets": 7 },
+                            { "width": "6%", "targets": 8, "className":"text-center" },
+                            { "width": "4%", "targets": 9, "className":"text-center" },
+                            {
+                                // The `data` parameter refers to the data for the cell (defined by the
+                                // `data` option, which defaults to the column being worked with, in
+                                // this case `data: 0`.
+                                "render": function ( data, type, row ) {
+                                    return '<button type="button" class="btn btn-info btn-xs btn_view_repair" data-toggle="modal" id="'+row[2]+'"><i class="fa fa-info-circle" aria-hidden="true"></i></button> '
+                                },
+                                "targets": 10,
+                                "width": "3%", "className":"text-right", "visible": false
+                            }
+                          ],
+               "ajax" : {
+                  url:"report/fetch_monthly_report.php",
+                  type:"POST",
+                  data:{is_date_search:is_date_search, month:month, year:year}
+               }
+
+            });
+            //End dataTable
+
+            $('a.toggle-vis').on( 'click', function (e) {
+                   e.preventDefault();
+
+                   // Get the column API object
+                   var column = dataTable.column( $(this).attr('data-column') );
+
+                   // Toggle the visibility
+                   column.visible( ! column.visible() );
+               } );
+
+            getMonthYear();
+
+           }
+
+         function getMonthYear(){
+           var m = document.getElementById("month").selectedIndex;
+           var m_text = document.getElementById("month").options;
+           var y = document.getElementById("year").selectedIndex;
+           var y_text = document.getElementById("year").options;
+           // alert("Index: " + m_text[m].index + " is " + m_text[m].text);
+           //แสดง เดือนและปี
+           document.getElementById('m_text').value  = m_text[m].text;
+           document.getElementById('y_text').value  = y_text[y].text;
+           document.getElementById('month_text').innerHTML  = m_text[m].text;
+           document.getElementById('year_text').innerHTML  = y_text[y].text;
+         }
+
+           $('#month, #year').change(function(){
+            if(month != '' && year !='')
+            {
+             $('#p_data').fadeOut(100);
+             $('#p_data').fadeIn('slow');
+             $('#p_data').DataTable().destroy();
+             fetch_data('yes', month, year);
+            }
+            else
+            {
+             alert("ยังไม่ได้ใส่เงื่อนไข");
+            }
+           });
+
+           //Update
+           $(document).on('click', '.btn_view_repair', function(){
+
+             var repair_code = this.id;
+             console.log(repair_code);
+             var part = '../webapp/p_pm_print_job_repair_report.php?repair_code='+repair_code;
+             // window.location = part;
+             window.open(part, '_blank');
+
+           });
+
+
+});
+// End Main Jquery
+
+
+function ckJOB_CODE(){
+var s_job_code = document.getElementById("s_job_code");
+var i_job_code = document.getElementById("i_job_code");
+
+if(i_job_code.value == '')
+{
+  alert('ยังไม่ได้ระบุรหัสอะไหล่ที่ต้องการค้นหา!');
+  document.getElementById("i_job_code").focus();
+  return false;
+}else{
+  return true;
+}
+
+}
+
+
+function getCount(action_name){
+
+var username = $('.user').text();
+var level = $('.level').text();
+
+// alert(username.text()+' '+level.text());
+
+  $.ajax({
+    url: 'action.php',
+    method: 'post',
+    data: {'action':'get_'+action_name, 'username':username, 'level':level},
+    success:function(response){
+      $('#'+action_name).text(response);
+    }
+  });
+}
+
+</script>
